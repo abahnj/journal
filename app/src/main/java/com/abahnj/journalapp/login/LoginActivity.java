@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -27,24 +28,12 @@ import com.google.android.gms.tasks.Task;
  */
 public class LoginActivity extends AppCompatActivity {
 
-    /**
-     * Id to identity READ_CONTACTS permission request.
-     */
-    private static final int REQUEST_READ_CONTACTS = 0;
 
-
-    /**
-     * A dummy authentication store containing known user names and passwords.
-     * TODO: remove after connecting to a real authentication system.
-     */
-    private static final String[] DUMMY_CREDENTIALS = new String[]{
-            "foo@example.com:hello", "bar@example.com:world"
-    };
     private static final int RC_SIGN_IN = 1000;
     private static final String TAG = LoginActivity.class.getSimpleName();
 
     private GoogleSignInClient mGoogleSignInClient;
-    private SignInButton mGoogleSignInButton;
+    private Button mGoogleSignInButton;
     private View mLoginFormView;
     private ProgressBar mProgressView;
 
@@ -72,17 +61,9 @@ public class LoginActivity extends AppCompatActivity {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
 
 
-        mGoogleSignInButton = findViewById(R.id.sign_in_button);
-        mGoogleSignInButton.setSize(SignInButton.SIZE_WIDE);
-        mGoogleSignInButton.setColorScheme(SignInButton.COLOR_DARK);
-        mGoogleSignInButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                signIn();
-            }
-        });
+        mGoogleSignInButton = findViewById(R.id.next_button);
+        mGoogleSignInButton.setOnClickListener(view -> signIn());
 
-        mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
     }
@@ -137,7 +118,7 @@ public class LoginActivity extends AppCompatActivity {
 
         int shortAnimTime = getResources().getInteger(android.R.integer.config_shortAnimTime);
 
-        mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
+        /*mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
         mLoginFormView.animate().setDuration(shortAnimTime).alpha(
                 show ? 0 : 1).setListener(new AnimatorListenerAdapter() {
             @Override
@@ -145,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
                 mLoginFormView.setVisibility(show ? View.GONE : View.VISIBLE);
             }
         });
-
+*/
         mProgressView.setVisibility(show ? View.VISIBLE : View.GONE);
         mProgressView.animate().setDuration(shortAnimTime).alpha(
                 show ? 1 : 0).setListener(new AnimatorListenerAdapter() {

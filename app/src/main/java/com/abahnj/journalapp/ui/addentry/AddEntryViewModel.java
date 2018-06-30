@@ -1,25 +1,82 @@
 package com.abahnj.journalapp.ui.addentry;
 
+import android.app.Application;
+import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
 
+import com.abahnj.journalapp.common.SingleLiveEvent;
 import com.abahnj.journalapp.data.JournalEntry;
-import com.abahnj.journalapp.data.source.local.AppDatabase;
+import com.abahnj.journalapp.data.source.JournalRepository;
 
-// TODO (5) Make this class extend ViewModel
-public class AddEntryViewModel extends ViewModel {
+public class AddEntryViewModel extends AndroidViewModel {
+    private final SingleLiveEvent<Void> mEntryUpdated = new SingleLiveEvent<>();
+    private final JournalRepository mJournalRepository;
+    public Boolean dataLoading = false;
     private LiveData<JournalEntry> journalEntry;
-    public AddEntryViewModel(AppDatabase mDb, int mTaskId) {
-        journalEntry = mDb.journalDao().loadEntryById(mTaskId);
+    private int mJournalId;
+    private boolean mIsNewEntry;
+    private boolean mIsDataLoaded = false;
+
+    AddEntryViewModel(Application context, JournalRepository journalRepository) {
+        super(context);
+        mJournalRepository = journalRepository;
     }
 
     public LiveData<JournalEntry> getJournalEntry() {
         return journalEntry;
     }
-// TODO (6) Add a task member variable for the TaskEntry object wrapped in a LiveData
 
-    // TODO (8) Create a constructor where you call loadTaskById of the taskDao to initialize the tasks variable
-    // Note: The constructor should receive the database and the taskId
+    public void start(int journalId) {
+        if (dataLoading) {
+            // Already loading, ignore.
+            return;
+        }
+        mJournalId = journalId;
+        if (journalId == -1) {
+            // No need to populate, it's a new task
+            mIsNewEntry = true;
+            return;
+        }
+        if (mIsDataLoaded) {
+            // No need to populate, already have data.
+            return;
+        }
+        mIsNewEntry = false;
+        dataLoading = true;
 
-    // TODO (7) Create a getter for the task variable
+       journalEntry = mJournalRepository.getJournalEntry(journalId);
+    }
+
+    // Called when clicking on fab.
+    void saveEntry(JournalEntry entry) {
+        if (entry.isEmpty()) {
+            return;
+        }
+        if (isNewEntry() ) {
+            createEntry(entry);
+        } else {
+            updateEntry(entry);
+        }
+    }
+
+    private boolean isNewEntry() {
+        return mIsNewEntry;
+    }
+
+    SingleLiveEvent<Void> getEntryUpdatedEvent() {
+        return mEntryUpdated;
+    }
+
+    private void createEntry(JournalEntry newEntry) {
+        mJournalRepository.saveJournalEntry(newEntry);
+        mEntryUpdated.call();
+    }
+
+    private void updateEntry(JournalEntry entry) {
+        if (isNewEntry()) {
+            throw new RuntimeException("updateEntry() was called but task is new.");
+        }
+        mJournalRepository.saveJournalEntry(entry);
+        mEntryUpdated.call();
+    }
 }

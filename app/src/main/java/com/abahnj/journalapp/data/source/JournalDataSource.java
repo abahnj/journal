@@ -16,6 +16,7 @@
 
 package com.abahnj.journalapp.data.source;
 
+import android.arch.lifecycle.LiveData;
 import android.support.annotation.NonNull;
 
 import com.abahnj.journalapp.data.JournalEntry;
@@ -28,23 +29,10 @@ import java.util.List;
  */
 public interface JournalDataSource {
 
-    interface LoadJournalEntriesCallback {
 
-        void onJournalEntriesLoaded(List<JournalEntry> JournalEntries);
+    <T extends LiveData> T getJournalEntries();
 
-        void onDataNotAvailable();
-    }
-
-    interface GetJournalEntriesCallback {
-
-        void onJournalEntriesLoaded(JournalEntry journalEntry);
-
-        void onDataNotAvailable();
-    }
-
-    void getJournalEntries(@NonNull LoadJournalEntriesCallback callback);
-
-    void getJournalEntry(@NonNull String journalEntryId, @NonNull GetJournalEntriesCallback callback);
+    LiveData<JournalEntry> getJournalEntry(int journalEntryId);
 
     void saveJournalEntry(@NonNull JournalEntry journalEntry);
 
@@ -52,5 +40,5 @@ public interface JournalDataSource {
 
     void deleteAllJournalEntries();
 
-    void deleteJournalEntry(@NonNull String journalEntryId);
+    void deleteJournalEntry(int journalEntryId);
 }

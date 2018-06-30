@@ -26,7 +26,7 @@ public class AppUtils {
      * @author schnatterer
      */
     public enum AppStart {
-        FIRST_TIME, FIRST_TIME_VERSION, NORMAL;
+        FIRST_TIME, FIRST_TIME_VERSION, NORMAL
     }
 
         /**
@@ -70,7 +70,7 @@ public class AppUtils {
             return appStart;
         }
 
-        public static AppStart checkAppStart(int currentVersionCode, int lastVersionCode) {
+        private static AppStart checkAppStart(int currentVersionCode, int lastVersionCode) {
             if (lastVersionCode == -1) {
                 return AppStart.FIRST_TIME;
             } else if (lastVersionCode < currentVersionCode) {

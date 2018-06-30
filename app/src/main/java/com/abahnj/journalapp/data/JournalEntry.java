@@ -7,6 +7,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.abahnj.journalapp.common.Model;
 import com.google.android.gms.common.internal.Objects;
 import com.google.common.base.Strings;
 
@@ -14,15 +15,28 @@ import java.util.Calendar;
 import java.util.Date;
 
 @Entity(tableName = "journal")
-public final class JournalEntry {
+public final class JournalEntry extends Model {
     @PrimaryKey(autoGenerate = true)
     private int id;
 
-    @Nullable
-    private final String title;
+
+    @Ignore
+    public JournalEntry() {
+    }
+
+    public void setTitle(@Nullable String title) {
+        this.title = title;
+    }
+
+    public void setDescription(@Nullable String description) {
+        this.description = description;
+    }
 
     @Nullable
-    private final String description;
+    private String title;
+
+    @Nullable
+    private String description;
 
     public void setUpdatedAt(Date updatedAt) {
         this.updatedAt = updatedAt;
@@ -36,10 +50,10 @@ public final class JournalEntry {
     @ColumnInfo(name = "updated_at")
     private Date updatedAt;
     /**
-     * Use this constructor to create a new active Task.
+     * Use this constructor to create a new active JournalEntry.
      *
-     * @param title       title of the task
-     * @param description description of the task
+     * @param title       title of the entry
+     * @param description description of the entry
      */
     @Ignore
     public JournalEntry(@Nullable String title, @Nullable String description) {
@@ -50,8 +64,7 @@ public final class JournalEntry {
 
 
     /**
-     * Use this constructor to specify a completed Task if the Task already has an id (copy of
-     * another Task).
+     *
      *
      * @param title       title of the task
      * @param description description of the task
@@ -64,7 +77,6 @@ public final class JournalEntry {
         this.updatedAt = Calendar.getInstance().getTime();
     }
 
-    @NonNull
     public int getId() {
         return id;
     }
@@ -98,6 +110,10 @@ public final class JournalEntry {
                 Strings.isNullOrEmpty(description);
     }
 
+//    public <T extends JournalEntry> T withId(@NonNull final String id) {
+//        this.id = Integer.valueOf(id);
+//        return (T) this;
+//    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

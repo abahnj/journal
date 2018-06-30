@@ -23,6 +23,8 @@
     <string name="add_button">Add</string>
     <string name="update_button">Update</string>
     <string name="edit_entry_title">Title</string>
+    <string name="button_next">Next</string>
+    <string name="button_cancel">Cancel</string>
 
 
 </resources>

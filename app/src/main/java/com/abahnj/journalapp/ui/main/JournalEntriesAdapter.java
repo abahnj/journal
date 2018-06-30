@@ -22,49 +22,47 @@ public class JournalEntriesAdapter extends ListAdapter<JournalEntry, JournalEntr
     private final OnListFragmentInteractionListener mListener;
 
 
-    protected JournalEntriesAdapter(OnListFragmentInteractionListener listener) {
+    JournalEntriesAdapter(OnListFragmentInteractionListener listener) {
         super(DIFF_CALLBACK);
         mListener =listener;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.fragment_entries, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         JournalEntry journalEntry = getItem(position);
         holder.mItem = getItem(position);
         holder.mIdView.setText(String.valueOf(journalEntry.getId()));
         holder.mContentView.setText(journalEntry.getDescription());
 
-        holder.mView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (null != mListener) {
-                    // Notify the active callbacks interface (the activity, if the
-                    // fragment is attached to one) that an item has been selected.
-                    mListener.onListFragmentInteraction(holder.mItem);
-                }
+        holder.mView.setOnClickListener(v -> {
+            if (null != mListener) {
+                // Notify the active callbacks interface (the activity, if the
+                // fragment is attached to one) that an item has been selected.
+                mListener.onListFragmentInteraction(holder.mItem);
             }
         });
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
-        public final View mView;
-        public final TextView mIdView;
-        public final TextView mContentView;
-        public JournalEntry mItem;
+        final View mView;
+        final TextView mIdView;
+        final TextView mContentView;
+        JournalEntry mItem;
 
 
-        public ViewHolder(View view) {
+        ViewHolder(View view) {
             super(view);
             mView = view;
-            mIdView =  view.findViewById(R.id.item_number);
-            mContentView =  view.findViewById(R.id.content);
+            mIdView =  view.findViewById(R.id.tv_overline);
+            mContentView =  view.findViewById(R.id.tv_description);
         }
 
         @Override

@@ -1,4 +1,4 @@
-package com.abahnj.journalapp.ui.addentry;
+package com.abahnj.journalapp.ui.main;
 
 import android.annotation.SuppressLint;
 import android.app.Application;
@@ -6,26 +6,25 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.abahnj.journalapp.data.JournalEntry;
 import com.abahnj.journalapp.data.source.JournalRepository;
-import com.abahnj.journalapp.data.source.local.AppDatabase;
+import com.abahnj.journalapp.ui.addentry.AddEntryViewModel;
 import com.abahnj.journalapp.utilities.Injection;
 
-public class AddEntryViewModelFactory extends ViewModelProvider.NewInstanceFactory{
+public class MainViewModelFactory extends ViewModelProvider.NewInstanceFactory{
 
     @SuppressLint("StaticFieldLeak")
-    private static volatile AddEntryViewModelFactory INSTANCE;
+    private static volatile MainViewModelFactory INSTANCE;
 
     private final Application mApplication;
 
     private final JournalRepository mJournalRepository;
 
-    public static AddEntryViewModelFactory getInstance(Application application) {
+    public static MainViewModelFactory getInstance(Application application) {
 
         if (INSTANCE == null) {
-            synchronized (AddEntryViewModelFactory.class) {
+            synchronized (MainViewModelFactory.class) {
                 if (INSTANCE == null) {
-                    INSTANCE = new AddEntryViewModelFactory(application,
+                    INSTANCE = new MainViewModelFactory(application,
                             Injection.provideJournalRepository(application.getApplicationContext()));
                 }
             }
@@ -34,7 +33,7 @@ public class AddEntryViewModelFactory extends ViewModelProvider.NewInstanceFacto
     }
 
 
-    AddEntryViewModelFactory(Application application, JournalRepository repository) {
+    private MainViewModelFactory(Application application, JournalRepository repository) {
         mApplication = application;
         mJournalRepository = repository;
     }
@@ -44,6 +43,6 @@ public class AddEntryViewModelFactory extends ViewModelProvider.NewInstanceFacto
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
         //noinspection unchecked
-        return (T) new AddEntryViewModel(mApplication, mJournalRepository);
+        return (T) new MainViewModel(mApplication, mJournalRepository);
     }
 }

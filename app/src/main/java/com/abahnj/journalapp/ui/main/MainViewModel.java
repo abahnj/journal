@@ -3,11 +3,16 @@ package com.abahnj.journalapp.ui.main;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.MediatorLiveData;
 import android.util.Log;
 
 import com.abahnj.journalapp.data.JournalEntry;
-import com.abahnj.journalapp.data.source.local.AppDatabase;
+import com.abahnj.journalapp.data.source.JournalRepository;
+import com.abahnj.journalapp.utilities.AppExecutors;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -16,16 +21,23 @@ public class MainViewModel extends AndroidViewModel {
     // Constant for logging
     private static final String TAG = MainViewModel.class.getSimpleName();
 
-    private LiveData<List<JournalEntry>> tasks;
+    private final LiveData<List<JournalEntry>> entries;
+    private final MediatorLiveData<List<JournalEntry>> entryMediatorLiveData = new MediatorLiveData<>();
 
-    public MainViewModel(Application application) {
+
+    private JournalRepository mRepository;
+
+    public MainViewModel(Application application, JournalRepository repository) {
         super(application);
-        AppDatabase database = AppDatabase.getInstance(this.getApplication());
         Log.d(TAG, "Actively retrieving the tasks from the DataBase");
-        tasks = database.journalDao().loadAllEntries();
+        mRepository = repository;
+        entries = mRepository.getJournalEntries();
     }
 
     public LiveData<List<JournalEntry>> getEntries() {
-        return tasks;
+        return entries;
+    }
+    public LiveData<List<JournalEntry>> getT() {
+        return entryMediatorLiveData;
     }
 }

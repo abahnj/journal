@@ -16,6 +16,7 @@ import com.abahnj.journalapp.data.JournalEntry;
 import com.abahnj.journalapp.login.LoginActivity;
 import com.abahnj.journalapp.ui.addentry.AddEntryActivity;
 import com.abahnj.journalapp.utilities.AppUtils;
+import com.abahnj.journalapp.utilities.AppUtils.AppStart;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 
@@ -28,12 +29,26 @@ public class MainActivity extends AppCompatActivity implements EntriesFragment.O
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AppUtils.AppStart appStart = AppUtils.checkAppStart(this,
+        AppStart appStart = AppUtils.checkAppStart(this,
                 PreferenceManager.getDefaultSharedPreferences(this));
-        Intent loginActivity = new Intent(this, LoginActivity.class);
 
         googleSignInAccount = getIntent().getParcelableExtra("default");
 
+       checkAppStart(appStart);
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+
+
+        FloatingActionButton fab =  findViewById(R.id.fab);
+        fab.setOnClickListener(view -> {
+            Intent addEntryIntent = new Intent(MainActivity.this, AddEntryActivity.class);
+            startActivity(addEntryIntent);
+        });
+    }
+
+    private void checkAppStart(AppStart appStart) {
+        Intent loginActivity = new Intent(this, LoginActivity.class);
         switch (appStart) {
             case NORMAL:
                 if (googleSignInAccount == null) {
@@ -46,26 +61,12 @@ public class MainActivity extends AppCompatActivity implements EntriesFragment.O
             case FIRST_TIME_VERSION:
                 break;
         }
-
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        FloatingActionButton fab =  findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent addEntryIntent = new Intent(MainActivity.this, AddEntryActivity.class);
-                startActivity(addEntryIntent);
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        //getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
@@ -75,12 +76,10 @@ public class MainActivity extends AppCompatActivity implements EntriesFragment.O
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

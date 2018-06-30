@@ -4,6 +4,7 @@ import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import static android.support.v7.widget.DividerItemDecoration.HORIZONTAL;
 import static android.support.v7.widget.DividerItemDecoration.VERTICAL;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * A fragment representing a list of Items.
@@ -72,7 +74,7 @@ public class EntriesFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = rootView.findViewById(R.id.journal_entry_list);
@@ -89,9 +91,6 @@ public class EntriesFragment extends Fragment {
         touchHelper = setupTouchHelper();
         touchHelper.attachToRecyclerView(mRecyclerView);
 
-        DividerItemDecoration decoration = new DividerItemDecoration(getContext(), HORIZONTAL);
-        mRecyclerView.addItemDecoration(decoration);
-
         setupViewModel();
         return rootView;
     }
@@ -99,22 +98,18 @@ public class EntriesFragment extends Fragment {
     private ItemTouchHelper setupTouchHelper() {
         return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
             @Override
-            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
                 return false;
             }
 
             // Called when a user swipes left or right on a ViewHolder
             @Override
-            public void onSwiped(final RecyclerView.ViewHolder viewHolder, int swipeDir) {
+            public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 // Here is where you'll implement swipe to delete
-                AppExecutors.getInstance().diskIO().execute(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        int position = viewHolder.getAdapterPosition();
-                        JournalEntry journalEntry = mAdapter.getItem(position);
-                        mDb.journalDao().deleteEntry(journalEntry);
-                    }
+                AppExecutors.getInstance().diskIO().execute(() -> {
+                    int position = viewHolder.getAdapterPosition();
+                    JournalEntry journalEntry = mAdapter.getItem(position);
+                    mDb.journalDao().deleteEntry(journalEntry);
                 });
             }
         });
@@ -158,24 +153,21 @@ public class EntriesFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
         void onListFragmentInteraction(JournalEntry item);
     }
 
-   Observer<List<JournalEntry>> observer = new Observer<List<JournalEntry>>() {
-        @Override
-        public void onChanged(@Nullable List<JournalEntry> journalEntries) {
-            if (journalEntries.size() > 0){
+    private void setupViewModel() {
+        MainViewModelFactory factory = MainViewModelFactory.getInstance(getActivity().getApplication());
+
+        MainViewModel viewModel = ViewModelProviders.of(getActivity(), factory).get(MainViewModel.class);
+        viewModel.getEntries().observe(this, journalEntries -> {
+            if (checkNotNull(journalEntries).size() > 0){
                 Log.d(TAG, "Updating list of tasks from LiveData in ViewModel");
                 mEmptyView.setVisibility(View.GONE);
                 mAdapter.submitList(journalEntries);
             } else {
                 mEmptyView.setVisibility(View.VISIBLE);
             }
-        }
-    };
-    private void setupViewModel() {
-        MainViewModel viewModel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
-        viewModel.getEntries().observe(this, observer);
+        });
     }
 }
