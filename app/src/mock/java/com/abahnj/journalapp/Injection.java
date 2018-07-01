@@ -19,12 +19,13 @@ package com.abahnj.journalapp;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.abahnj.journalapp.data.FakeJournalRemoteDataSource;
 import com.abahnj.journalapp.data.source.JournalDataSource;
 import com.abahnj.journalapp.data.source.JournalRepository;
 import com.abahnj.journalapp.data.source.local.AppDatabase;
 import com.abahnj.journalapp.data.source.local.JournalLocalDataSource;
+import com.abahnj.journalapp.data.source.remote.JournalRemoteDataSource;
 import com.abahnj.journalapp.utilities.AppExecutors;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -39,7 +40,7 @@ public class Injection {
     public static JournalRepository provideJournalRepository(@NonNull Context context) {
         checkNotNull(context);
         AppDatabase database = AppDatabase.getInstance(context);
-        return JournalRepository.getInstance(FakeJournalRemoteDataSource.getInstance(),
+        return JournalRepository.getInstance(JournalRemoteDataSource.getInstance(FirebaseFirestore.getInstance()),
                 JournalLocalDataSource.getInstance( AppExecutors.getInstance(),
                         database.journalDao()));
     }
