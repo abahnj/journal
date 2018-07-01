@@ -22,7 +22,9 @@
         <activity
             android:name=".login.LoginActivity"
             android:label="@string/title_activity_login" />
-        <activity android:name=".ui.addentry.AddEntryActivity" />
+        <activity android:name=".ui.addentry.AddEntryActivity"
+            android:windowSoftInputMode="stateVisible|adjustResize"
+            />
 
         <meta-data
             android:name="preloaded_fonts"

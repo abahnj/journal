@@ -14,10 +14,10 @@ public class AddEntryViewModel extends AndroidViewModel {
     public Boolean dataLoading = false;
     private LiveData<JournalEntry> journalEntry;
     private int mJournalId;
-    private boolean mIsNewEntry;
+    public boolean mIsNewEntry = true;
     private boolean mIsDataLoaded = false;
 
-    AddEntryViewModel(Application context, JournalRepository journalRepository) {
+    public AddEntryViewModel(Application context, JournalRepository journalRepository) {
         super(context);
         mJournalRepository = journalRepository;
     }
@@ -41,14 +41,12 @@ public class AddEntryViewModel extends AndroidViewModel {
             // No need to populate, already have data.
             return;
         }
-        mIsNewEntry = false;
-        dataLoading = true;
 
        journalEntry = mJournalRepository.getJournalEntry(journalId);
     }
 
     // Called when clicking on fab.
-    void saveEntry(JournalEntry entry) {
+    public void saveEntry(JournalEntry entry) {
         if (entry.isEmpty()) {
             return;
         }
@@ -76,7 +74,7 @@ public class AddEntryViewModel extends AndroidViewModel {
         if (isNewEntry()) {
             throw new RuntimeException("updateEntry() was called but task is new.");
         }
-        mJournalRepository.saveJournalEntry(entry);
+        mJournalRepository.updateJournalEntry(entry);
         mEntryUpdated.call();
     }
 }

@@ -6,9 +6,7 @@ import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
 
-import com.abahnj.journalapp.data.JournalEntry;
 import com.abahnj.journalapp.data.source.JournalRepository;
-import com.abahnj.journalapp.data.source.local.AppDatabase;
 import com.abahnj.journalapp.utilities.Injection;
 
 public class AddEntryViewModelFactory extends ViewModelProvider.NewInstanceFactory{

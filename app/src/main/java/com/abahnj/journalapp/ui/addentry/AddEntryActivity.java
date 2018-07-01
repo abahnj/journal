@@ -28,8 +28,6 @@ import android.arch.lifecycle.ViewModelProviders;
 import com.abahnj.journalapp.R;
 import com.abahnj.journalapp.data.JournalEntry;
 import com.abahnj.journalapp.data.source.local.AppDatabase;
-import com.abahnj.journalapp.utilities.AppExecutors;
-
 
 
 public class AddEntryActivity extends AppCompatActivity {
@@ -38,6 +36,8 @@ public class AddEntryActivity extends AppCompatActivity {
     public static final String EXTRA_ENTRY_ID = "extraEntryId";
     // Extra for the task ID to be received after rotation
     public static final String INSTANCE_ENTRY_ID = "instanceTaskId";
+
+    private JournalEntry currentEntry;
 
     AddEntryViewModel viewModel = null;
 
@@ -71,6 +71,7 @@ public class AddEntryActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra(EXTRA_ENTRY_ID)) {
+            viewModel.mIsNewEntry = false;
             mButton.setText(R.string.update_button);
             if (mEntryId == DEFAULT_ENTRY_ID) {
                 // populate the UI
@@ -83,11 +84,14 @@ public class AddEntryActivity extends AppCompatActivity {
                     @Override
                     public void onChanged(@Nullable JournalEntry journalEntry) {
                         viewModel.getJournalEntry().removeObserver(this);
+                        currentEntry = journalEntry;
                         populateUI(journalEntry);
                         viewModel.dataLoading = false;
                     }
                 });
             }
+        } else {
+            viewModel.mIsNewEntry = true;
         }
     }
 
@@ -116,10 +120,10 @@ public class AddEntryActivity extends AppCompatActivity {
      * initViews is called from onCreate to init the member variable views
      */
     private void initViews() {
-        mTitleEditText = findViewById(R.id.editTextTaskTitle);
-        mTitleEditText.setEnabled(false);
-        mTitleEditText.setFocusable(false);
-        mDescriptionEditText = findViewById(R.id.editTextTaskDescription);
+        mTitleEditText = findViewById(R.id.editTextEntryTitle);
+        //mTitleEditText.setEnabled(false);
+        //mTitleEditText.setFocusable(false);
+        mDescriptionEditText = findViewById(R.id.editTextEntryDescription);
 
         mButton = findViewById(R.id.saveButton);
         mButton.setOnClickListener(view -> onSaveButtonClicked());
@@ -143,11 +147,14 @@ public class AddEntryActivity extends AppCompatActivity {
      * It retrieves user input and inserts that new task data into the underlying database.
      */
     public void onSaveButtonClicked() {
+        if (currentEntry != null) {
+            viewModel.saveEntry(currentEntry);
+        } else {
         String title = mTitleEditText.getText().toString();
         String description = mDescriptionEditText.getText().toString();
         final JournalEntry journalEntry = new JournalEntry(title, description);
-
         viewModel.saveEntry(journalEntry);
+        }
         finish();
 
 /*

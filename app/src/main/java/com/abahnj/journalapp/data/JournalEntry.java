@@ -55,7 +55,6 @@ public final class JournalEntry extends Model {
      * @param title       title of the entry
      * @param description description of the entry
      */
-    @Ignore
     public JournalEntry(@Nullable String title, @Nullable String description) {
         this.title = title;
         this.description = description;
@@ -70,6 +69,7 @@ public final class JournalEntry extends Model {
      * @param description description of the task
      * @param id          id of the task
      */
+    @Ignore
     public JournalEntry(@Nullable String title, @Nullable String description,
                  int id) {
         this(title, description);

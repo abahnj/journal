@@ -63,12 +63,22 @@ public class JournalRemoteDataSource implements JournalDataSource {
     }
 
     @Override
+    public void updateJournalEntry(JournalEntry journalEntry) {
+
+    }
+
+    @Override
     public void refreshJournalEntries() {
 
     }
 
     @Override
     public void deleteAllJournalEntries() {
+
+    }
+
+    @Override
+    public void deleteJournalEntry(JournalEntry journalEntryId) {
 
     }
 

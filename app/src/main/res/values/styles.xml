@@ -9,8 +9,9 @@
         <item name="android:colorBackground">@color/loginPageBackgroundColor</item>
     </style>
 
-    <style name="Widget.Journal.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlineBox">
+    <style name="Widget.Journal.TextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
         <item name="hintTextAppearance">@style/TextAppearance.Journal.TextInputLayout.HintText</item>
+        <item name="android:textColorPrimaryDisableOnly">#fff</item>
         <item name="android:paddingBottom">8dp</item>
     </style>
 

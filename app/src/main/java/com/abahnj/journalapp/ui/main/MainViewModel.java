@@ -6,6 +6,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MediatorLiveData;
 import android.util.Log;
 
+import com.abahnj.journalapp.common.SnackbarMessage;
 import com.abahnj.journalapp.data.JournalEntry;
 import com.abahnj.journalapp.data.source.JournalRepository;
 import com.abahnj.journalapp.utilities.AppExecutors;
@@ -24,7 +25,6 @@ public class MainViewModel extends AndroidViewModel {
     private final LiveData<List<JournalEntry>> entries;
     private final MediatorLiveData<List<JournalEntry>> entryMediatorLiveData = new MediatorLiveData<>();
 
-
     private JournalRepository mRepository;
 
     public MainViewModel(Application application, JournalRepository repository) {
@@ -34,10 +34,20 @@ public class MainViewModel extends AndroidViewModel {
         entries = mRepository.getJournalEntries();
     }
 
+    public void deleteEntry(JournalEntry journalEntry) {
+        mRepository.deleteJournalEntry(journalEntry);
+    }
+    public void deleteAllEntries() {
+        mRepository.deleteAllJournalEntries();
+    }
+    public void addEntry (JournalEntry journalEntry) {
+        mRepository.saveJournalEntry(journalEntry);
+    }
     public LiveData<List<JournalEntry>> getEntries() {
         return entries;
     }
     public LiveData<List<JournalEntry>> getT() {
         return entryMediatorLiveData;
     }
+
 }

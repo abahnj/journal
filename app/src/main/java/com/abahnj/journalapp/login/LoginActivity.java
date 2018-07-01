@@ -19,6 +19,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInStatusCodes;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
@@ -99,6 +100,10 @@ public class LoginActivity extends AppCompatActivity {
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            if (e.getStatusCode() == GoogleSignInStatusCodes.NETWORK_ERROR) {
+                Log.w(TAG, "signInResult:network error=" + e.getMessage());
+
+            }
             Log.w(TAG, "signInResult:failed code=" + e.getMessage());
             Toast.makeText(this, "Sign In Failed", Toast.LENGTH_SHORT).show();
             showProgress(false);

@@ -25,6 +25,6 @@
     <string name="edit_entry_title">Title</string>
     <string name="button_next">Next</string>
     <string name="button_cancel">Cancel</string>
-
+    <string name="delete">delete</string>
 
 </resources>

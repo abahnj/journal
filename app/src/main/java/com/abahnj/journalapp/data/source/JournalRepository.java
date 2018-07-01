@@ -102,13 +102,23 @@ public class JournalRepository implements JournalDataSource {
     }
 
     @Override
+    public void updateJournalEntry(JournalEntry journalEntry) {
+        mJournalLocalDataSource.updateJournalEntry(journalEntry);
+    }
+
+    @Override
     public void refreshJournalEntries() {
 
     }
 
     @Override
     public void deleteAllJournalEntries() {
+        mJournalLocalDataSource.deleteAllJournalEntries();
+    }
 
+    @Override
+    public void deleteJournalEntry(JournalEntry journalEntry) {
+        mJournalLocalDataSource.deleteJournalEntry(journalEntry);
     }
 
     @Override

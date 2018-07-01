@@ -5,9 +5,9 @@ import android.app.Application;
 import android.arch.lifecycle.ViewModel;
 import android.arch.lifecycle.ViewModelProvider;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.abahnj.journalapp.data.source.JournalRepository;
-import com.abahnj.journalapp.ui.addentry.AddEntryViewModel;
 import com.abahnj.journalapp.utilities.Injection;
 
 public class MainViewModelFactory extends ViewModelProvider.NewInstanceFactory{
@@ -30,6 +30,12 @@ public class MainViewModelFactory extends ViewModelProvider.NewInstanceFactory{
             }
         }
         return INSTANCE;
+    }
+
+
+    @VisibleForTesting
+    public static void destroyInstance() {
+        INSTANCE = null;
     }
 
 

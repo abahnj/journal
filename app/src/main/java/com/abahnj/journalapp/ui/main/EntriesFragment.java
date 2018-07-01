@@ -3,9 +3,11 @@ package com.abahnj.journalapp.ui.main;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.DividerItemDecoration;
@@ -19,6 +21,7 @@ import android.view.ViewGroup;
 
 import com.abahnj.journalapp.R;
 import com.abahnj.journalapp.data.JournalEntry;
+import com.abahnj.journalapp.data.source.JournalRepository;
 import com.abahnj.journalapp.data.source.local.AppDatabase;
 import com.abahnj.journalapp.utilities.AppExecutors;
 
@@ -34,7 +37,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class EntriesFragment extends Fragment {
+public class EntriesFragment extends Fragment implements RecyclerItemTouchHelper.RecyclerItemTouchHelperListener {
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -44,9 +47,9 @@ public class EntriesFragment extends Fragment {
     private RecyclerView mRecyclerView;
     JournalEntriesAdapter mAdapter;
     private View mEmptyView;
-    private ItemTouchHelper touchHelper;
     private OnListFragmentInteractionListener mListener;
-    private AppDatabase mDb;
+    private JournalRepository repository;
+    private MainViewModel viewModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -79,7 +82,6 @@ public class EntriesFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRecyclerView = rootView.findViewById(R.id.journal_entry_list);
         mEmptyView = rootView.findViewById(R.id.main_activity_empty_view);
-        mDb = AppDatabase.getInstance(getContext());
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(rootView.getContext()));
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -88,34 +90,55 @@ public class EntriesFragment extends Fragment {
         mAdapter = new JournalEntriesAdapter(mListener);
         mRecyclerView.setAdapter(mAdapter);
 
-        touchHelper = setupTouchHelper();
-        touchHelper.attachToRecyclerView(mRecyclerView);
+        setupTouchHelper();
 
         setupViewModel();
         return rootView;
     }
 
-    private ItemTouchHelper setupTouchHelper() {
-        return new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
-            @Override
-            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
-                return false;
-            }
+    private void setupTouchHelper() {
+           /*
+         Add a touch helper to the RecyclerView to recognize when a user swipes to delete an item.
+         An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
+         and uses callbacks to signal when a user is performing these actions.
+         */
+        // adding item touch helper
+        // only ItemTouchHelper.LEFT added to detect Right to Left swipe
+        // if you want both Right -> Left and Left -> Right
+        // add pass ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT as param
+        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
+        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
 
-            // Called when a user swipes left or right on a ViewHolder
-            @Override
-            public void onSwiped(@NonNull final RecyclerView.ViewHolder viewHolder, int swipeDir) {
-                // Here is where you'll implement swipe to delete
-                AppExecutors.getInstance().diskIO().execute(() -> {
-                    int position = viewHolder.getAdapterPosition();
-                    JournalEntry journalEntry = mAdapter.getItem(position);
-                    mDb.journalDao().deleteEntry(journalEntry);
-                });
-            }
-        });
+
     }
 
+    /**
+     * callback when recycler view is swiped
+     * item will be removed on swiped
+     * undo option will be provided in snackbar to restore the item
+     */
+    @Override
+    public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction, int position) {
+        if (viewHolder instanceof JournalEntriesAdapter.ViewHolder) {
+            // get the removed item name to display it in snack bar
+            String name = mAdapter.getItem(viewHolder.getAdapterPosition()).getTitleForList();
 
+            // backup of removed item for undo purpose
+            final JournalEntry deletedItem = mAdapter.getItem(viewHolder.getAdapterPosition());
+            viewModel.deleteEntry(deletedItem);
+
+            // showing snack bar with Undo option
+            Snackbar snackbar = Snackbar
+                    .make(getView(), name + " removed!", Snackbar.LENGTH_LONG);
+            snackbar.setAction("UNDO", view -> {
+                // undo is selected, restore the deleted item
+                viewModel.addEntry(deletedItem);
+            });
+            snackbar.setActionTextColor(getActivity().getResources().getColor(R.color.colorPrimaryDark));
+            snackbar.show();
+
+        }
+    }
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
@@ -127,11 +150,6 @@ public class EntriesFragment extends Fragment {
         }
     }
 
-        /*
-         Add a touch helper to the RecyclerView to recognize when a user swipes to delete an item.
-         An ItemTouchHelper enables touch behavior (like swipe and move) on each ViewHolder,
-         and uses callbacks to signal when a user is performing these actions.
-         */
 
 
 
@@ -159,7 +177,7 @@ public class EntriesFragment extends Fragment {
     private void setupViewModel() {
         MainViewModelFactory factory = MainViewModelFactory.getInstance(getActivity().getApplication());
 
-        MainViewModel viewModel = ViewModelProviders.of(getActivity(), factory).get(MainViewModel.class);
+        viewModel = ViewModelProviders.of(getActivity(), factory).get(MainViewModel.class);
         viewModel.getEntries().observe(this, journalEntries -> {
             if (checkNotNull(journalEntries).size() > 0){
                 Log.d(TAG, "Updating list of tasks from LiveData in ViewModel");

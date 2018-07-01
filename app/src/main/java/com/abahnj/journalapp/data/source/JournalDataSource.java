@@ -36,9 +36,14 @@ public interface JournalDataSource {
 
     void saveJournalEntry(@NonNull JournalEntry journalEntry);
 
+    void updateJournalEntry(JournalEntry journalEntry);
+
     void refreshJournalEntries();
 
     void deleteAllJournalEntries();
 
+    void deleteJournalEntry(JournalEntry journalEntryId);
+
     void deleteJournalEntry(int journalEntryId);
+
 }

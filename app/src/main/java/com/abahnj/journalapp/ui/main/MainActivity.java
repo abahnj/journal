@@ -4,10 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -40,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements EntriesFragment.O
 
 
 
-        FloatingActionButton fab =  findViewById(R.id.fab);
+        FloatingActionButton fab =  findViewById(R.id.fab_add_entry);
         fab.setOnClickListener(view -> {
             Intent addEntryIntent = new Intent(MainActivity.this, AddEntryActivity.class);
             startActivity(addEntryIntent);
