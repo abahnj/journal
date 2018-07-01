@@ -12,6 +12,8 @@ If you prefer to go the gradle route you can use
 ./gradlew installProdDebug
 ```
 
+### Code Climate
+[Journal App Code Climate Link](https://codeclimate.com/github/abahnj/journal)
 ### Testing
 
 Automated Tests
